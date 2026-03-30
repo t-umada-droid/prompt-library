@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIプロンプト集 — 栄養士説明会</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --border: #e2ded6;
+    --text: #1a1a1a;
+    --text-sub: #6b6660;
+    --accent: #2d6a4f;
+    --accent-light: #e8f4ee;
+    --accent2: #e07b39;
+    --accent2-light: #fdf0e6;
+    --tag-gem: #2d6a4f;
+    --tag-nlm: #5e4db2;
+    --tag-dr: #e07b39;
+    --tag-nlm-light: #f0ecfa;
+    --code-bg: #f0f7f3;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--accent);
+    color: #fff;
+    padding: 28px 24px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.3;
+    flex: 1;
+    min-width: 200px;
+  }
+  .header-sub {
+    font-size: 11px;
+    opacity: 0.75;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Search + Filter Bar ── */
+  .controls {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    position: sticky;
+    top: 80px;
+    z-index: 90;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .controls-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .search-wrap {
+    flex: 1;
+    min-width: 180px;
+    position: relative;
+  }
+  .search-wrap input {
+    width: 100%;
+    padding: 8px 12px 8px 34px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-sub);
+    font-size: 14px;
+  }
+
+  .filter-btns {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .18s;
+    color: var(--text-sub);
+    font-weight: 500;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .filter-btn.active-dr { background: var(--tag-dr); border-color: var(--tag-dr); color: #fff; }
+  .filter-btn.active-nlm { background: var(--tag-nlm); border-color: var(--tag-nlm); color: #fff; }
+
+  /* ── Count ── */
+  .count-bar {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 12px 24px 4px;
+    font-size: 12px;
+    color: var(--text-sub);
+  }
+
+  /* ── Grid ── */
+  .grid {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 4px 24px 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform .2s, box-shadow .2s;
+    display: flex;
+    flex-direction: column;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+  }
+
+  .card-header {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+  .tag-gem { background: var(--accent-light); color: var(--tag-gem); }
+  .tag-dr  { background: var(--accent2-light); color: var(--tag-dr); }
+  .tag-nlm { background: var(--tag-nlm-light); color: var(--tag-nlm); }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+    white-space: pre-line;
+  }
+
+  .card-body {
+    padding: 12px 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .meta-row {
+    font-size: 11px;
+    color: var(--text-sub);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+  }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .meta-label {
+    font-weight: 600;
+    color: var(--text-sub);
+  }
+
+  .purpose {
+    font-size: 12px;
+    color: var(--text-sub);
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Prompt block */
+  .prompt-block {
+    background: var(--code-bg);
+    border: 1px solid #c8e6d4;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: #1a3a2a;
+    max-height: 120px;
+    overflow: hidden;
+    position: relative;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: max-height .3s ease;
+  }
+  .prompt-block.expanded {
+    max-height: 2000px;
+  }
+  .prompt-fade {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 36px;
+    background: linear-gradient(transparent, var(--code-bg));
+    pointer-events: none;
+    transition: opacity .2s;
+  }
+  .prompt-block.expanded .prompt-fade { opacity: 0; }
+
+  /* Sub-prompt blocks */
+  .sub-block {
+    background: #f8f4ff;
+    border: 1px solid #d4c8f0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11.5px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: #2d1f5e;
+    max-height: 80px;
+    overflow: hidden;
+    position: relative;
+    transition: max-height .3s ease;
+  }
+  .sub-block.expanded { max-height: 2000px; }
+  .sub-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--tag-nlm);
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+  }
+  .sub-fade {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 28px;
+    background: linear-gradient(transparent, #f8f4ff);
+    pointer-events: none;
+  }
+  .sub-block.expanded .sub-fade { opacity: 0; }
+
+  /* Actions */
+  .card-actions {
+    padding: 10px 16px 14px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .18s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    letter-spacing: 0.02em;
+  }
+  .btn-copy {
+    background: var(--accent);
+    color: #fff;
+    flex: 1;
+  }
+  .btn-copy:hover { background: #235e42; }
+  .btn-copy.copied { background: #5a9e80; }
+
+  .btn-expand {
+    background: var(--bg);
+    color: var(--text-sub);
+    border: 1px solid var(--border);
+  }
+  .btn-expand:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Empty state */
+  .empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-sub);
+    font-size: 14px;
+  }
+
+  /* Section headings in grid */
+  .section-title {
+    grid-column: 1 / -1;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-sub);
+    padding: 8px 0 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .header { padding: 20px 16px; }
+    .controls { padding: 10px 16px; }
+    .grid { padding: 4px 16px 40px; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <h1>🌿 AIプロンプト集</h1>
+      <div class="header-sub">栄養士説明会 配布資料 ／ Gemini・NotebookLM 活用例</div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="controls-inner">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="キーワードで検索（献立・アレルギー・学校 など）">
+    </div>
+    <div class="filter-btns">
+      <button class="filter-btn active" data-filter="all">すべて</button>
+      <button class="filter-btn" data-filter="Gemini">Gemini</button>
+      <button class="filter-btn" data-filter="Gem">Gem（カスタム指示）</button>
+      <button class="filter-btn" data-filter="DR">Deep Research</button>
+      <button class="filter-btn" data-filter="NLM">NotebookLM</button>
+    </div>
+  </div>
+</div>
+
+<div class="count-bar"><span id="countLabel">読み込み中…</span></div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+// ─── Data ───────────────────────────────────────────────────────────────────
+const PROMPTS = [
+  // ── Sheet: Geminiプロンプト ──────────────────────────────────────────────
+  {
+    id: "P-0001",
+    tool: "Gemini",
+    sheet: "Geminiプロンプト",
+    title: "献立作成・食育活動サポート",
+    target: "食堂利用者",
+    purpose: "季節感や栄養バランスを考慮した献立のヒントを得る",
+    variables: "《実施月》《栄養価》《旬》《食材》《こだわりポイント》",
+    prompt: `・3月の社員食堂向けに、旬の菜の花を使った500kcal以下のヘルシー献立を5案出して`
+  },
+  {
+    id: "P-0002",
+    tool: "Gemini",
+    sheet: "Geminiプロンプト",
+    title: "献立作成・食育活動サポート（コラム）",
+    target: "食堂利用者",
+    purpose: "ポスター用の栄養豆知識、キャッチコピーの作成を効率化",
+    variables: "《テーマ》《対象者》《文字数》",
+    prompt: `・塩分を控えるメリットを、忙しい若手社員に刺さる言葉で300文字程度のコラムにして`
+  },
+  {
+    id: "P-0003",
+    tool: "Gemini",
+    sheet: "Geminiプロンプト",
+    title: "食中毒事故情報検索",
+    target: "店長、栄養士",
+    purpose: "知りたい情報を要約で得ること、作業時間の短縮",
+    variables: "《期間》《場所》《知りたい情報》《要約の仕方》",
+    prompt: `過去1週間以内に日本で発生した食中毒事件に関するニュース記事を検索してください。各事件について、発生場所、原因、感染者数、給食会社などの主要な情報を要約し、日本語に翻訳して箇条書きでリストアップしてください。また、その記事を参照したいのでそれぞれにURLを記載してください。`
+  },
+  {
+    id: "P-0004",
+    tool: "Gemini",
+    sheet: "Geminiプロンプト",
+    title: "学校給食／異物混入事故検索",
+    target: "学校給食従事者",
+    purpose: "他所で発生した異物混入事の事例から注意喚起を行う",
+    variables: "《期間》《場所》《異物混入情報》《要約の仕方》",
+    prompt: `過去1週間以内に日本の学校給食で発生した異物混入事件に関するニュース記事をWeb検索してください。各事件について、以下の主要な情報を要約し、日本語に翻訳して箇条書きでリストアップしてください：
+1. 発生場所
+2. 原因
+3. 被害者数
+4. 給食会社
+また、それぞれの記事の参照URLを必ず記載してください。`
+  },
+  {
+    id: "P-0005",
+    tool: "Gemini",
+    sheet: "Geminiプロンプト",
+    title: "食育コンテンツクリエイター（学校・保育園向け）",
+    target: "子ども（小学生まで）、保護者",
+    purpose: "食育の時間を割きやすくし、付加価値の高いサービス提供をサポート",
+    variables: "《食材》《知識》《イラスト》《お便り文》",
+    prompt: `じゃがいもについて、子供向けのわかりやすい食育の豆知識、イラスト案、保護者へのお便り文をセットで生成してください。`
+  },
+
+  // ── Sheet: Gem ──────────────────────────────────────────────────────────
+  {
+    id: "G-0001",
+    tool: "Gem",
+    sheet: "Gem",
+    title: "イベント献立作成 Gem【社員食堂】",
+    target: "社員食堂 栄養士",
+    purpose: "翌月の献立企画案を月間テーマ・週別・特別献立日・注目食材・健康促進企画・実装チェックリストで提案",
+    systemPrompt: `【ペルソナ】私は日本の給食会社で働く栄養士です。社員食堂で献立企画を担当しています。
+
+【基本情報】
+- 施設タイプ：社員食堂
+- 対象者：成人の男女（20代～60代）
+- 利用者数：約300名/日
+- 食事形態：普通食
+- アレルギー対応：特定原材料7品目の表示対応あり
+- 予算：1食あたり約350円（材料費ベース）
+
+【重視する点】
+- コストパフォーマンスと満足度の両立
+- 季節感と旬の食材活用によるメニューの変化
+- 栄養バランス（特に野菜摂取量と塩分管理）
+- ボリューム感と食べ応え（男性社員の満足度）
+- 行事食・郷土料理・世界の料理の取り入れ
+- 健康経営を意識したヘルシーメニューの提供
+- 作業効率（仕込み時間と提供スピード）
+
+翌月の献立企画案を提案する際は、以下の形式で出力してください：
+1. **月間テーマ提案**
+2. **週別企画案**
+3. **特別献立日**
+4. **注目食材リスト**
+5. **健康促進企画**
+6. **実装チェックリスト**
+7. **原価管理のポイント**`,
+    prompt: `来月（5月）の社員食堂献立企画案を作成してください。
+以下の要素を含めてください：
+
+1. ゴールデンウィーク明けの疲労回復を意識したメニュー
+2. 母の日（5月第2日曜）に合わせた特別メニュー
+3. 旬の食材（新玉ねぎ、アスパラガス等）を活用した週替わりテーマ
+4. 減塩週間の実施（第2週を想定）
+5. 男性社員の満足度とヘルシー志向の女性社員、両方に対応したメニューバランス
+6. 1食350円の予算内での原価管理のポイント
+7. 作業効率を考慮した仕込み計画`
+  },
+  {
+    id: "G-0002",
+    tool: "Gem",
+    sheet: "Gem",
+    title: "イベント献立作成 Gem【特別養護老人施設】",
+    target: "特養 栄養士",
+    purpose: "翌月の昼食献立企画案を食形態別（常食・軟菜・刻み・ミキサー）に展開、嚥下・誤嚥リスク管理を含む提案",
+    systemPrompt: `私は日本の給食会社で働く栄養士です。特別養護老人施設で献立企画を担当しています。
+
+【基本情報】
+- 施設タイプ：特別養護老人ホーム
+- 対象者：高齢者（65歳以上、要介護3～5が中心）
+- 利用者数：約150名
+- 提供時間：昼食（12:00提供）
+- 予算：1食あたり約350円（材料費ベース）
+
+【食事形態の内訳】
+- 常食（普通食）：約40名
+- 軟菜食（やわらか食）：約60名
+- 刻み食：約30名
+- ミキサー食（ペースト食）：約20名
+
+【重視する点】
+- 誤嚥・窒息リスクの低減（食材の大きさ・硬さ・とろみ）
+- 噛む力・飲み込む力に配慮した食形態
+- 季節感と旬の食材による楽しみの提供
+- 栄養バランス（特にタンパク質・カルシウム・水分・食物繊維）
+- 減塩・適正エネルギー（生活習慣病管理）
+- 行事食・郷土料理・懐かしい味の再現
+- 見た目の美しさ（食欲促進）
+- 調理作業の効率性（多段階食形態への展開）`,
+    prompt: `来月（5月）の特別養護老人ホーム昼食献立企画案を作成してください。
+以下の要素を含めてください：
+
+1. 端午の節句（5/5）に合わせた行事食と多段階食形態での展開方法
+2. 母の日（5月第2日曜）のお祝い献立
+3. 旬の食材（新玉ねぎ、アスパラガス、初夏の野菜）を活用した週替わりテーマ
+4. 水分補給強化週間の実施（第3週を想定、脱水予防）
+5. タンパク質強化メニュー（フレイル・サルコペニア予防）
+6. 常食・軟菜食・刻み食・ミキサー食への効率的な展開ポイント
+7. 誤嚥リスクの高い食材の代替案や安全な調理法
+8. 1食350円の予算内での原価管理のコツ
+9. 調理・盛付・配膳のタイムライン（12:00配膳完了目標）`
+  },
+  {
+    id: "G-0003",
+    tool: "Gem",
+    sheet: "Gem",
+    title: "朝礼ブリーフィング作成Gem【学校給食】",
+    target: "学校給食センター 栄養士・責任者",
+    purpose: "当日献立の朝礼原稿（3〜5分）を自動生成。調理注意点・アレルゲン管理・過去事例警告・今日の一言を含む",
+    systemPrompt: `あなたは学校給食センターの朝礼ブリーフィング原稿を作成する安全管理アシスタントです。栄養士や責任者が朝礼で口頭で読み上げることを前提に、3〜5分で伝えられる分量の原稿を作成してください。
+
+■ 出力構成（この順番で必ず出力すること）
+【1. 今日の献立確認】（30秒）
+【2. 調理上の注意点】（1〜2分）
+【3. アレルゲン管理の確認】（30秒〜1分）
+【4. 過去事例からの警告】（30秒〜1分）
+【5. 今日の一言】（15秒）
+
+■ 文体・表現のルール
+- 「です・ます」調の口語体（読み上げやすさ優先）
+- 重要な数値（温度・時間）は必ず具体的に述べる
+- 全体で800〜1200文字を目安にする
+
+■ 過去事例の照合ルール
+- 同一メニュー名・食材・調理工程・作業リスクで照合
+- 重大度の高い順に最大3件まで取り上げる
+- 季節的な注意事項も考慮する`,
+    prompt: `添付の献立の朝礼ブリーフィングを全日分作成してください`
+  },
+
+  // ── Sheet: Deep Research ────────────────────────────────────────────────
+  {
+    id: "DR-0001",
+    tool: "DR",
+    sheet: "Gemini DR",
+    title: "健康経営支援メニューの市場調査",
+    target: "カフェ事業部",
+    purpose: "競合他社のヘルスケアサービスを分析し、自社の新たな強みを見つける",
+    prompt: `あなたは給食業界に精通したシニアマーケターです。企業の「健康経営」支援を目的とした、社員食堂およびオフィス向け食の提供サービスに関する最新の市場動向を調査してください。
+以下の項目について網羅的に深掘りし、レポートとしてまとめてください。
+
+1.市場のトレンド: 過去3年間で、企業が社員食堂に求めるニーズはどう変化しているか？（例：パーソナライズ食、腸活、プラントベースなど）
+
+2.競合分析: 大手給食サービス企業（例：エームサービス、グリーンハウス、LEOCなど）が展開している「健康経営」に特化したブランドや取り組みを洗い出し、それぞれの「ターゲット」「提供価値」「特徴」を比較表にしてください。
+
+3.異業種参入の脅威: フードテック企業や冷凍弁当のサブスク（例：オフィスおかん等）など、給食会社以外のプレイヤーがオフィス食市場にどう入り込んでいるか分析してください。
+
+4.戦略提案: 上記を踏まえ、中堅〜大手の給食会社が今後コンペで勝つために打ち出すべき、新しいメニューコンセプトまたは付加価値サービスのアイデアを3つ提案してください。`
+  },
+  {
+    id: "DR-0002",
+    tool: "DR",
+    sheet: "Gemini DR",
+    title: "サステナブル＆ダイバーシティ給食の動向",
+    target: "学校・メディカル事業部",
+    purpose: "プロポーザル入札の評価向上のため、SDGs・食の多様性の先進事例を調査",
+    prompt: `学校・保育園・自治体向けの給食事業における、「サステナビリティ（環境配慮）」および「ダイバーシティ（食の多様性）」に関する国内外の最新動向を調査してください。
+
+1.先進事例の抽出: 国内外の学校給食において、代替タンパク質の導入、食品ロス削減システム、環境配慮型パッケージの導入で成功している事例を3〜5つ挙げ、その成功要因を分析してください。
+
+2.自治体の評価基準: 近年、自治体が給食業務を民間委託する際の評価基準において、SDGsやサステナビリティがどの程度重視されているか調査してください。
+
+3.課題と解決策: 現場の栄養士や調理スタッフが、これらの新しい食材や運用を導入する際の「現場の壁（コスト、味、手間）」を分析し、解決するためのテクノロジーや外部パートナーの候補をリストアップしてください。`
+  },
+  {
+    id: "DR-0003",
+    tool: "DR",
+    sheet: "Gemini DR",
+    title: "人手不足時代の次世代オペレーション調査",
+    target: "メディカル事業部",
+    purpose: "クックチル・スマート厨房機器を「安全性向上」としてマーケティングするための調査",
+    prompt: `病院および高齢者福祉施設向けの給食市場における、深刻な人手不足を背景とした「調理の外部化・システム化（クックチル、完全調理済冷凍食品、セントラルキッチン活用）」の市場動向を調査してください。
+
+1.市場規模と予測: 病院・介護施設向け給食における完全調理品・半調理品の市場規模の推移と今後5年間の予測をデータを交えて解説してください。
+
+2.クライアントの心理分析: 管理者が「完全調理品の導入」へ切り替える際の最大の心理的ハードルと、導入を決断した決定打は何かを分析してください。
+
+3.リフレーミング戦略: 人手不足対応というネガティブな理由ではなく、味の均一化・衛生管理の向上・栄養士がケアに専念できる等、ポジティブな価値として訴求するためのマーケティングメッセージを5つ考案してください。`
+  },
+  {
+    id: "DR-0004",
+    tool: "DR",
+    sheet: "Gemini DR",
+    title: "Food as Medicine（薬としての食）とパーソナライズ栄養",
+    target: "カフェ・メディカル事業部",
+    purpose: "個人の生体データと日々の給食をリンクさせる最新トレンドを調査",
+    prompt: `グローバルな食のトレンドである「Food as Medicine（薬としての食）」および「パーソナライズ栄養（個別化栄養）」の最新動向と、それが集団給食（B2Bフードサービス）に与える影響を調査してください。
+
+1.海外の最新事例: 米国や欧州の病院・企業において、患者や従業員の生体データ（スマートウォッチ、血糖値センサー、腸内フローラ検査など）と連携して提供される食事プログラムの具体例。
+
+2.給食業界への応用: これまで「一律の食事」を提供してきた給食会社が、個人のニーズに対応するための最新アプローチや、提携しているヘルステック企業の事例。
+
+3.栄養士の役割の変化: パーソナライズ化が進む中で、今後の管理栄養士・栄養士に求められる新しいスキルや、AIとどのように協働していくべきかの予測。`
+  },
+  {
+    id: "DR-0005",
+    tool: "DR",
+    sheet: "Gemini DR",
+    title: "サーキュラーエコノミーを体現する次世代給食",
+    target: "カフェ・メディカル・学校事業部",
+    purpose: "食材の生産から廃棄までを循環させる最先端サステナビリティ動向を調査",
+    prompt: `フードサービスおよび給食業界における「サーキュラーエコノミー（循環型経済）」と「カーボンニュートラル」に向けた最新の取り組みを調査してください。
+
+環境負荷の可視化: 提供するメニューの「カーボンフットプリント」を算出し、消費者に提示している先進的な企業や大学食堂の事例。
+
+新食材とアップサイクル: 未利用魚、規格外野菜の活用だけでなく、食品残渣から作られた「アップサイクル食品」や、環境負荷の低い「次世代代替タンパク質（培養肉、藻類など）」を給食に導入している事例。
+
+クローズドループの実現: 給食施設で発生した生ゴミを堆肥化・バイオガス化し、契約農家で再利用して食材として買い戻す「完全循環型モデル」の成功例とその仕組み。`
+  },
+  {
+    id: "DR-0006",
+    tool: "DR",
+    sheet: "Gemini DR",
+    title: "物価高騰と給食無償化を乗り切るコスト・栄養管理",
+    target: "学校事業部",
+    purpose: "決められた予算内で栄養基準と美味しさを保つ代替アプローチやテクノロジーを調査",
+    prompt: `学校給食事業における「食材費の高騰」と「給食費の無償化・予算固定化」という課題に対する、国内外の最新の解決策を調査してください。
+
+1.代替食材と新メニュー開発: 栄養価を維持しつつコストを抑えるための新しい食材活用事例（最新の大豆ミートの活用、未利用魚のすり身、米粉の新しい調理法など）。
+
+2.AIによる需要予測とロス削減: 給食センターにおける発注量の最適化や、児童の残食データ分析によるメニュー改良で食品ロスと食材費を同時に削減している成功事例。
+
+3.広域連携とセントラルキッチンの進化: 複数の自治体が連携して共同調理場を運営する事例や、民間企業のノウハウを活かした配送・調理の効率化モデルの最新動向。`
+  },
+  {
+    id: "DR-0007",
+    tool: "DR",
+    sheet: "Gemini DR",
+    title: "腸管免疫の最前線「ポストバイオティクス」",
+    target: "全事業部",
+    purpose: "ポストバイオティクス（短鎖脂肪酸など）が全身の免疫細胞にどう作用するか最新論文ベースの知見をまとめる",
+    prompt: `栄養学および免疫学の最新の学術論文（主に過去5年以内）を横断検索し、「腸管免疫」と「ポストバイオティクス（短鎖脂肪酸などの代謝産物）」の関連について詳細な文献レビューを行ってください。
+
+1.メカニズムの最新知見: ポストバイオティクスが腸管壁を介して全身の免疫システムにどのように作用するのか、最新の科学的コンセンサスを解説してください。
+
+2.有効な栄養素と食材: 腸内での短鎖脂肪酸の産生を最大化するために、最もエビデンスレベルが高いとされる水溶性食物繊維の種類と、それらを効率よく摂取できる具体的な食材の組み合わせを挙げてください。
+
+3.大量調理への応用可能性: ポストバイオティクスやレジスタントスターチの特性を活かし、給食（加熱調理や作り置きが前提）において免疫力向上メニューを開発するための具体的なアイデアを提案してください。`
+  },
+  {
+    id: "DR-0008",
+    tool: "DR",
+    sheet: "Gemini DR",
+    title: "時間栄養学と免疫システムの概日リズム",
+    target: "カフェ・メディカル・学校事業部",
+    purpose: "「いつ食べるか」が免疫にどう影響するか、シフトワーカー向け栄養アプローチを調査",
+    prompt: `「時間栄養学」と「免疫システム（自律神経、内分泌系を含む）」の相互作用に関する最新の学術的知見を調査し、レポートを作成してください。
+
+1.概日リズムと免疫機能の相関: 白血球の働きや炎症性サイトカインの分泌など、免疫機能が1日のうちでどのように変動しているか（概日リズム）とそのメカニズムを解説してください。
+
+2.食事のタイミングが与える影響: 朝食の欠食、夜遅い時間の食事、時間制限食（16時間断食など）が、腸内細菌叢の概日リズムや全身の免疫応答にどのようなポジティブ・ネガティブな影響を与えるか、最新の論文をもとに評価してください。
+
+3.シフトワーカー（夜勤者）への栄養アプローチ: 病院の看護師や工場の従業員など、概日リズムが乱れやすい夜勤従事者に対して、企業の社員食堂で提供すべき「体内時計をリセットするメニュー」や「夜勤中の最適な間食のとり方」を提案してください。`
+  },
+
+  // ── Sheet: NotebookLM FR ─────────────────────────────────────────────────
+  {
+    id: "NLM-FR-0001",
+    tool: "NLM",
+    sheet: "NotebookLM FR",
+    title: "自治体・先行事例の調査",
+    target: "学校事業部",
+    purpose: "新規コンペや食育企画の提案前に、全国的なトレンドや成功事例を素早く把握する",
+    howto: "NotebookLM「ウェブからソースを検索（Fast Research）」を使用",
+    prompt: `全国の学校給食における、地産地消を取り入れた最新の献立事例と課題`
+  },
+  {
+    id: "NLM-FR-0002",
+    tool: "NLM",
+    sheet: "NotebookLM FR",
+    title: "アレルギー対応・新食材の最新知見収集",
+    target: "カフェ・メディカル事業部",
+    purpose: "アレルギー対応食品やプラントベースフードの最新情報を効率よくリサーチ",
+    howto: "NotebookLM「ウェブからソースを検索（Fast Research）」を使用",
+    prompt: `特定原材料不使用（卵・乳・小麦）の代替食品の最新トレンドと導入事例`
+  },
+  {
+    id: "NLM-FR-0003",
+    tool: "NLM",
+    sheet: "NotebookLM FR",
+    title: "栄養学ガイドラインのキャッチアップ",
+    target: "メディカル事業部",
+    purpose: "最新の栄養学論文や厚生労働省レポートをAIが収集、献立作成の根拠（エビデンス）を更新",
+    howto: "NotebookLM「ウェブからソースを検索（Fast Research）」を使用",
+    prompt: `高齢者のフレイル（虚弱）予防に効果的な栄養アプローチと最新の論文`
+  },
+  {
+    id: "NLM-FR-0004",
+    tool: "NLM",
+    sheet: "NotebookLM FR",
+    title: "全国ご当地焼きそば調査（イベント献立開発）",
+    target: "カフェ事業部",
+    purpose: "イベント献立のテーマ候補を幅広く収集し、大量調理向けに絞り込む",
+    howto: "NotebookLM「ウェブからソースを検索（Fast Research）」を使用。提案されたソースから5〜6個選びインポート後、以下のプロンプトを使用",
+    prompt: `・日本全国 有名 ご当地焼きそば 特徴 一覧
+・B級グルメ 焼きそば 地方限定 人気ランキング`,
+    subPrompt: `追加した資料から、一般の人が食べたことのないご当地焼きそばを5つピックアップし、『地域名』『麺の特徴』『ソースの味付け』『特徴的な具材・トッピング』を比較表にまとめてください。`
+  },
+
+  // ── Sheet: NotebookLM栄養相談 ───────────────────────────────────────────
+  {
+    id: "NLM-NC-0001",
+    tool: "NLM",
+    sheet: "NotebookLM栄養相談",
+    title: "個別栄養相談アドバイス【若年層・食生活の乱れ】",
+    target: "社員食堂 栄養士",
+    purpose: "健診データや生活状況をもとにAIが栄養アドバイスを生成",
+    howto: "NotebookLMのチャット機能を使用",
+    prompt: `22歳女性・入社1年目
+BMI 17.8（低体重）
+朝食を抜くことが多い
+社員食堂は週2〜3回・コンビニ食が多い
+疲れやすいと感じている`
+  },
+  {
+    id: "NLM-NC-0002",
+    tool: "NLM",
+    sheet: "NotebookLM栄養相談",
+    title: "個別栄養相談アドバイス【働き盛り・メタボ予備群】",
+    target: "社員食堂 栄養士",
+    purpose: "メタボリックシンドローム予備群へのエビデンスベースの食事指導",
+    howto: "NotebookLMのチャット機能を使用",
+    prompt: `48歳男性・デスクワーク中心
+腹囲87cm・血圧135/85mmHg
+空腹時血糖105mg/dL・中性脂肪160mg/dL
+社員食堂週4回・外食・飲み会も多い
+運動習慣なし`
+  },
+  {
+    id: "NLM-NC-0003",
+    tool: "NLM",
+    sheet: "NotebookLM栄養相談",
+    title: "個別栄養相談アドバイス【シニア・複数リスク応用編】",
+    target: "社員食堂 栄養士",
+    purpose: "服薬中・腎機能低下・定年間近という複合リスクへの対応",
+    howto: "NotebookLMのチャット機能を使用",
+    prompt: `60歳男性・管理職・定年間近
+高血圧（服薬中）・脂質異常症
+eGFR 65（腎機能やや低下）
+食欲は旺盛だが最近体重が減少傾向
+社員食堂週5回利用
+
+以下も合わせて答えてください：
+・服薬中の場合に食事指導で注意すべき点はあるか
+・腎機能低下と他の疾患管理で矛盾する指導内容があれば優先順位を示す
+・定年後の食生活変化を見据えたアドバイスも加える`
+  },
+  {
+    id: "NLM-NC-0004",
+    tool: "NLM",
+    sheet: "NotebookLM栄養相談",
+    title: "栄養相談結果から音声解説を生成",
+    target: "社員食堂 栄養士",
+    purpose: "相談結果を2人のホスト会話形式でわかりやすく解説する音声コンテンツを生成",
+    howto: "上記の栄養相談アドバイスを生成後、続けて入力",
+    prompt: `今回の栄養相談の結果に基づいて伝えたいポイントをわかりやすく解説してください。
+
+・医療用語は使わずやさしい言葉で
+・「明日のランチから実践できること」を必ず1つ以上含める
+・2人のホストが「なぜそうなのか」を掘り下げて会話する形式で
+・聴いた人が前向きな気持ちになる締めくくりにする`
+  },
+  {
+    id: "NLM-NC-0005",
+    tool: "NLM",
+    sheet: "NotebookLM栄養相談",
+    title: "栄養相談結果から相談記録レポートを生成",
+    target: "社員食堂 栄養士",
+    purpose: "相談者本人に渡せるA4 1枚分の記録レポートを自動作成",
+    howto: "上記の栄養相談アドバイスを生成後、続けて入力",
+    prompt: `今回の栄養相談で以下の構成で相談記録レポートを作成してください。
+
+【構成】
+1. 相談者プロフィールと主訴（3行以内）
+2. 健診データと注目すべき数値
+3. ガイドラインに基づく指導方針
+4. 具体的なアドバイス（箇条書き3〜5項目）
+5. 社員食堂での実践ポイント
+6. 次回確認目標
+7. 栄養士所見欄（空欄）
+
+・引用元のガイドライン名を明記する
+・相談者本人に渡せる平易な表現にする
+・A4用紙1枚に収まる分量にする`
+  },
+
+  // ── Sheet: NotebookLM学校 ────────────────────────────────────────────────
+  {
+    id: "NLM-SC-0001",
+    tool: "NLM",
+    sheet: "NotebookLM学校",
+    title: "仕様書Gem 基本Q&A【坂戸市立浅羽野中学校】",
+    target: "学校給食従事者",
+    purpose: "仕様書をNotebookLMに登録し、現場のあらゆる疑問に即答できる状態にする",
+    howto: "NotebookLMに仕様書（R7.4改訂版）をアップロードし、カスタム指示を設定後に使用",
+    prompt: `・エアコンの塩素消毒時の注意点は？
+・果物を扱うときは何色エプロンで手袋は必要ですか？
+・フードスライサー使用後の手順を教えてください
+・検便成績報告書の提出期限は？`
+  },
+  {
+    id: "NLM-SC-0002",
+    tool: "NLM",
+    sheet: "NotebookLM学校",
+    title: "入社初日スタッフ向けスライド資料",
+    target: "学校給食 新人スタッフ",
+    purpose: "仕様書から入社初日に覚えるべきルールを7枚以内のスライドにまとめる",
+    howto: "仕様書をアップロードしたNotebookLMで使用",
+    prompt: `入社初日のスタッフ向けに、絶対に守らなければいけないルールを優先順位順に7枚以内でまとめてください。
+専門用語はやさしい言葉に言い換え、数字（温度・濃度・時間）は大きく表示。
+1枚目は『今日覚える3つのこと』にする`
+  },
+  {
+    id: "NLM-SC-0003",
+    tool: "NLM",
+    sheet: "NotebookLM学校",
+    title: "フラッシュカード（表：場面 / 裏：答え＋理由）",
+    target: "学校給食 新人スタッフ",
+    purpose: "入社1週間以内に覚えるべき項目を問題形式でカード化",
+    howto: "仕様書をアップロードしたNotebookLMで使用",
+    prompt: `入社1週間以内に覚えるべき項目をカード化してください。
+表：場面（例：肉を触った後は？）
+裏：答え＋理由（例：手洗い消毒。肉汁が他の食品に移るため）`
+  },
+  {
+    id: "NLM-SC-0004",
+    tool: "NLM",
+    sheet: "NotebookLM学校",
+    title: "理解度確認クイズ（4択10問）",
+    target: "学校給食 新人スタッフ",
+    purpose: "入社1週間後の理解度確認用クイズを生成",
+    howto: "仕様書をアップロードしたNotebookLMで使用",
+    prompt: `入社1週間後の理解度確認用クイズを作成してください。
+エプロンの色・手洗いタイミング・温度管理・消毒方法を中心に4択10問。正解の根拠も解説に入れる`
+  },
+  {
+    id: "NLM-SC-0005",
+    tool: "NLM",
+    sheet: "NotebookLM学校",
+    title: "エプロン色分け 現場掲示用インフォグラフィック",
+    target: "学校給食従事者",
+    purpose: "エプロンの色と対応作業を一目でわかる掲示用図に生成",
+    howto: "仕様書をアップロードしたNotebookLMで使用",
+    prompt: `現場掲示用（A4横向き）でエプロンの色と対応作業を一目でわかる図にしてください。
+ピンク・ブルー・グリーン・白・黄色の5色を色ごとに大きく表示。手袋必要・不要も明記する`
+  },
+  {
+    id: "NLM-SC-0006",
+    tool: "NLM",
+    sheet: "NotebookLM学校",
+    title: "消毒液希釈表（バケツ容量別）",
+    target: "学校給食従事者",
+    purpose: "5%・6%それぞれの希釈方法を、現場で見てすぐ計算できる掲示用表に生成",
+    howto: "仕様書をアップロードしたNotebookLMで使用",
+    prompt: `5%と6%それぞれの希釈方法を現場で見てすぐ計算できる形で掲示用にまとめてください。
+バケツ1L・3L・6Lの原液量を大きな表で表示する`
+  },
+  {
+    id: "NLM-SC-0007",
+    tool: "NLM",
+    sheet: "NotebookLM学校",
+    title: "調理機器・器具 清掃頻度一覧表",
+    target: "学校給食従事者",
+    purpose: "調理機器・器具の清掃頻度を毎日・週1・月1・学期1回に分けた壁貼り用一覧表",
+    howto: "仕様書をアップロードしたNotebookLMで使用",
+    prompt: `調理機器・器具の清掃頻度を毎日・週1・月1・学期1回に分けて一覧表にしてください。現場の壁に貼って確認できるサイズ感で`
+  },
+  {
+    id: "NLM-SC-0008",
+    tool: "NLM",
+    sheet: "NotebookLM学校",
+    title: "まな板・包丁 色分け掲示",
+    target: "学校給食従事者",
+    purpose: "食材別のまな板・包丁色分けを代表食材の例と一緒に現場掲示用に生成",
+    howto: "仕様書をアップロードしたNotebookLMで使用",
+    prompt: `食材別のまな板・包丁の色分けを現場掲示用にまとめてください。
+赤・黄・無印・緑の4分類を代表食材の例と一緒に大きく表示`
+  },
+  {
+    id: "NLM-SC-0009",
+    tool: "NLM",
+    sheet: "NotebookLM学校",
+    title: "長期休業 点検・清掃チェックリスト",
+    target: "学校給食 責任者",
+    purpose: "長期休業終了後・開始前の点検・清掃作業を責任者が確認できるチェックリスト形式でまとめる",
+    howto: "仕様書をアップロードしたNotebookLMで使用",
+    prompt: `長期休業終了後・開始前の点検・清掃作業を責任者が確認できるチェックリスト形式でまとめてください`
+  },
+  {
+    id: "NLM-SC-0010",
+    tool: "NLM",
+    sheet: "NotebookLM学校",
+    title: "提出書類 一覧表（提出先・期限・頻度・様式番号）",
+    target: "学校給食従事者",
+    purpose: "提出が必要な書類を提出先・提出期限・提出頻度・様式番号の4列で一覧化",
+    howto: "仕様書をアップロードしたNotebookLMで使用",
+    prompt: `提出が必要な書類を提出先・提出期限・提出頻度・様式番号の4列で一覧化してください`
+  }
+];
+
+// ─── Render ─────────────────────────────────────────────────────────────────
+const TOOL_LABELS = { Gemini:"Gemini", Gem:"Gem", DR:"Deep Research", NLM:"NotebookLM" };
+const TOOL_TAG_CLASS = { Gemini:"tag-gem", Gem:"tag-gem", DR:"tag-dr", NLM:"tag-nlm" };
+
+const grid = document.getElementById("grid");
+const searchInput = document.getElementById("searchInput");
+const countLabel = document.getElementById("countLabel");
+let currentFilter = "all";
+let expandedCards = new Set();
+
+function tagHTML(tool) {
+  return `<span class="tag ${TOOL_TAG_CLASS[tool] || 'tag-gem'}">${TOOL_LABELS[tool] || tool}</span>`;
+}
+
+function renderCards(list) {
+  grid.innerHTML = "";
+  countLabel.textContent = `${list.length} 件表示中`;
+  if (list.length === 0) {
+    grid.innerHTML = `<div class="empty">🔍 該当するプロンプトが見つかりませんでした</div>`;
+    return;
+  }
+
+  list.forEach(p => {
+    const isExpanded = expandedCards.has(p.id);
+    const hasLong = p.prompt && p.prompt.length > 120;
+    const hasSystem = !!p.systemPrompt;
+    const hasSub = !!p.subPrompt;
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.id = p.id;
+
+    let metaHtml = "";
+    if (p.target) metaHtml += `<span class="meta-item"><span class="meta-label">対象：</span>${p.target}</span>`;
+    if (p.howto) metaHtml += `<span class="meta-item">📌 ${p.howto}</span>`;
+    if (p.variables) metaHtml += `<span class="meta-item"><span class="meta-label">変数：</span>${p.variables}</span>`;
+
+    // Determine copy target
+    const copyText = p.systemPrompt ? p.systemPrompt + "\n\n---\n\n" + p.prompt : p.prompt;
+
+    card.innerHTML = `
+      <div class="card-header">
+        ${tagHTML(p.tool)}
+        <div class="card-title">${escHtml(p.title)}</div>
+      </div>
+      <div class="card-body">
+        ${p.purpose ? `<div class="purpose">💡 ${escHtml(p.purpose)}</div>` : ""}
+        ${metaHtml ? `<div class="meta-row">${metaHtml}</div>` : ""}
+        ${hasSystem ? `
+          <div>
+            <div class="sub-label">📋 カスタム指示（Gemへ設定）</div>
+            <div class="sub-block ${isExpanded ? 'expanded' : ''}" id="sys-${p.id}">
+              ${escHtml(p.systemPrompt)}
+              <div class="sub-fade"></div>
+            </div>
+          </div>` : ""}
+        <div>
+          <div class="sub-label">💬 プロンプト</div>
+          <div class="prompt-block ${isExpanded ? 'expanded' : ''}" id="prompt-${p.id}">
+            ${escHtml(p.prompt)}
+            <div class="prompt-fade"></div>
+          </div>
+        </div>
+        ${hasSub ? `
+          <div>
+            <div class="sub-label">➕ 追加プロンプト</div>
+            <div class="sub-block ${isExpanded ? 'expanded' : ''}" id="sub-${p.id}">
+              ${escHtml(p.subPrompt)}
+              <div class="sub-fade"></div>
+            </div>
+          </div>` : ""}
+      </div>
+      <div class="card-actions">
+        <button class="btn btn-copy" data-copy="${escAttr(copyText)}" data-id="${p.id}">
+          📋 コピー
+        </button>
+        ${hasSub ? `<button class="btn btn-copy" style="flex:0;background:#5e4db2;" data-copy="${escAttr(p.subPrompt)}" data-id="${p.id}-sub">📋 追加</button>` : ""}
+        ${(hasLong || hasSystem) ? `<button class="btn btn-expand" data-expand="${p.id}">${isExpanded ? "▲ 折りたたむ" : "▼ 全表示"}</button>` : ""}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // Event delegation
+  grid.onclick = (e) => {
+    // Copy
+    const copyBtn = e.target.closest(".btn-copy");
+    if (copyBtn) {
+      const text = copyBtn.getAttribute("data-copy");
+      navigator.clipboard.writeText(text).then(() => {
+        copyBtn.textContent = "✅ コピーしました";
+        copyBtn.classList.add("copied");
+        setTimeout(() => {
+          copyBtn.textContent = "📋 コピー";
+          copyBtn.classList.remove("copied");
+        }, 1800);
+      });
+      return;
+    }
+    // Expand
+    const expBtn = e.target.closest(".btn-expand");
+    if (expBtn) {
+      const id = expBtn.getAttribute("data-expand");
+      if (expandedCards.has(id)) expandedCards.delete(id);
+      else expandedCards.add(id);
+      filterAndRender(); // re-render preserving state
+    }
+  };
+}
+
+function escHtml(s) {
+  if (!s) return "";
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function escAttr(s) {
+  if (!s) return "";
+  return s.replace(/"/g,"&quot;").replace(/\n/g,"&#10;");
+}
+
+function filterAndRender() {
+  const q = searchInput.value.toLowerCase().trim();
+  const f = currentFilter;
+  const list = PROMPTS.filter(p => {
+    const matchFilter =
+      f === "all" ||
+      (f === "Gemini" && p.tool === "Gemini") ||
+      (f === "Gem" && p.tool === "Gem") ||
+      (f === "DR" && p.tool === "DR") ||
+      (f === "NLM" && p.tool === "NLM");
+
+    if (!matchFilter) return false;
+    if (!q) return true;
+
+    const haystack = [p.title, p.purpose, p.target, p.prompt, p.systemPrompt, p.subPrompt, p.howto, p.variables]
+      .filter(Boolean).join(" ").toLowerCase();
+    return haystack.includes(q);
+  });
+  renderCards(list);
+}
+
+// Filter buttons
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    currentFilter = btn.dataset.filter;
+    document.querySelectorAll(".filter-btn").forEach(b => {
+      b.classList.remove("active","active-dr","active-nlm");
+    });
+    const cl = currentFilter === "DR" ? "active-dr" : currentFilter === "NLM" ? "active-nlm" : "active";
+    btn.classList.add(cl);
+    filterAndRender();
+  });
+});
+
+searchInput.addEventListener("input", filterAndRender);
+
+// Init
+filterAndRender();
+</script>
+</body>
+</html>
